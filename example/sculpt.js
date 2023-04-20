@@ -83,32 +83,36 @@ function reset() {
 	// bvhHelper.update();
 
 	var loader = new GLTFLoader();
-
-	loader.load("../models/chair_CJ.glb", function (gltf) {
-		gltf.scene.traverse(function (object) {
-			if (object.isMesh) {
-				console.log(object);
-				let geometry = object.geometry;
-				geometry = BufferGeometryUtils.mergeVertices(geometry);
-				geometry.attributes.position.setUsage(THREE.DynamicDrawUsage);
-				geometry.attributes.normal.setUsage(THREE.DynamicDrawUsage);
-				geometry.computeBoundsTree({ setBoundingBox: false });
-				const material = object.material;
-				console.log(geometry, material);
-				targetMesh = new THREE.Mesh(geometry, material);
-				targetMesh.frustumCulled = false;
-				scene.add(targetMesh);
+	const input = document.querySelector("input");
+	input.addEventListener("change", (event) => {
+		const file = event.target.files[0];
+		const url = URL.createObjectURL(file);
+		loader.load(url, function (gltf) {
+			gltf.scene.traverse(function (object) {
+				if (object.isMesh) {
+					console.log(object);
+					let geometry = object.geometry;
+					geometry = BufferGeometryUtils.mergeVertices(geometry);
+					geometry.attributes.position.setUsage(THREE.DynamicDrawUsage);
+					geometry.attributes.normal.setUsage(THREE.DynamicDrawUsage);
+					geometry.computeBoundsTree({ setBoundingBox: false });
+					const material = object.material;
+					console.log(geometry, material);
+					targetMesh = new THREE.Mesh(geometry, material);
+					targetMesh.frustumCulled = false;
+					scene.add(targetMesh);
+				}
+			});
+			if (!bvhHelper) {
+				bvhHelper = new MeshBVHVisualizer(targetMesh, params.depth);
+				if (params.displayHelper) {
+					scene.add(bvhHelper);
+				}
 			}
+
+			bvhHelper.mesh = targetMesh;
+			bvhHelper.update();
 		});
-		if (!bvhHelper) {
-			bvhHelper = new MeshBVHVisualizer(targetMesh, params.depth);
-			if (params.displayHelper) {
-				scene.add(bvhHelper);
-			}
-		}
-
-		bvhHelper.mesh = targetMesh;
-		bvhHelper.update();
 	});
 }
 
@@ -310,7 +314,7 @@ function init() {
 	});
 
 	controls = new OrbitControls(camera, renderer.domElement);
-	controls.minDistance = 1.5;
+	// controls.minDistance = 1.5;
 
 	controls.addEventListener("start", function () {
 		this.active = true;

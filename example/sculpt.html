@@ -33,6 +33,14 @@
 			a {
 				color: #eee;
 			}
+
+			#filebox {
+				position: absolute;
+				top: 100px;
+				width: 100%;
+				display: flex;
+				justify-content: center;
+			}
 		</style>
 	</head>
 	<body>
@@ -42,6 +50,9 @@
 			<br />
 			Matcap textures from
 			<a href="https://github.com/nidorx/matcas/">nidorx/matcaps repo</a>.
+		</div>
+		<div id="filebox">
+			<input type="file" accept=".glb" />
 		</div>
 		<script type="module" src="./sculpt.js"></script>
 	</body>
