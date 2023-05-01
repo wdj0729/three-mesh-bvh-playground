@@ -60,28 +60,6 @@ function reset() {
 		scene.remove(targetMesh);
 	}
 
-	// merge the vertices because they're not already merged
-	// let geometry = new THREE.IcosahedronBufferGeometry(1, 100);
-	// geometry.deleteAttribute("uv");
-	// geometry = BufferGeometryUtils.mergeVertices(geometry);
-	// geometry.attributes.position.setUsage(THREE.DynamicDrawUsage);
-	// geometry.attributes.normal.setUsage(THREE.DynamicDrawUsage);
-	// geometry.computeBoundsTree({ setBoundingBox: false });
-
-	// targetMesh = new THREE.Mesh(geometry, material);
-	// targetMesh.frustumCulled = false;
-	// scene.add(targetMesh);
-
-	// if (!bvhHelper) {
-	// 	bvhHelper = new MeshBVHVisualizer(targetMesh, params.depth);
-	// 	if (params.displayHelper) {
-	// 		scene.add(bvhHelper);
-	// 	}
-	// }
-
-	// bvhHelper.mesh = targetMesh;
-	// bvhHelper.update();
-
 	var loader = new GLTFLoader();
 	const input = document.querySelector("input");
 	input.addEventListener("change", (event) => {
@@ -90,14 +68,12 @@ function reset() {
 		loader.load(url, function (gltf) {
 			gltf.scene.traverse(function (object) {
 				if (object.isMesh) {
-					console.log(object);
 					let geometry = object.geometry;
 					geometry = BufferGeometryUtils.mergeVertices(geometry);
 					geometry.attributes.position.setUsage(THREE.DynamicDrawUsage);
 					geometry.attributes.normal.setUsage(THREE.DynamicDrawUsage);
 					geometry.computeBoundsTree({ setBoundingBox: false });
 					const material = object.material;
-					console.log(geometry, material);
 					targetMesh = new THREE.Mesh(geometry, material);
 					targetMesh.frustumCulled = false;
 					scene.add(targetMesh);
