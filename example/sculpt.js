@@ -13,6 +13,7 @@ import {
 	MeshBVHVisualizer,
 } from "..";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -213,17 +214,18 @@ function init() {
 	helperFolder.open();
 
 	gui.add({ reset }, "reset");
-	gui.add(
-		{
-			rebuildBVH: () => {
-				// don't create a bounding box because it's used in BVH construction but
-				// will be out of date after moving vertices. See issue #222.
-				targetMesh.geometry.computeBoundsTree({ setBoundingBox: false });
-				bvhHelper.update();
-			},
-		},
-		"rebuildBVH"
-	);
+	gui.add({ download }, "download");
+	// gui.add(
+	// 	{
+	// 		rebuildBVH: () => {
+	// 			// don't create a bounding box because it's used in BVH construction but
+	// 			// will be out of date after moving vertices. See issue #222.
+	// 			targetMesh.geometry.computeBoundsTree({ setBoundingBox: false });
+	// 			bvhHelper.update();
+	// 		},
+	// 	},
+	// 	"rebuildBVH"
+	// );
 	gui.open();
 
 	window.addEventListener(
@@ -657,4 +659,37 @@ function render() {
 
 	renderer.render(scene, camera);
 	stats.end();
+}
+
+function download() {
+	// Create a new GLTFExporter object
+	const exporter = new GLTFExporter();
+
+	return new Promise((resolve, reject) => {
+		exporter.parse(
+			scene,
+			(gltf) => {
+				const file = new Blob([gltf], { type: "application/octet-stream" });
+
+				downloadFile(URL.createObjectURL(file));
+			},
+			(e) => {
+				reject(e);
+			},
+			{
+				binary: true,
+			}
+		);
+	});
+}
+
+async function downloadFile(url) {
+	const fetchURL = await fetch(url);
+	const blob = await fetchURL.blob();
+	const URL = window.URL.createObjectURL(blob);
+	const link = document.createElement("a");
+	link.rel = "noopener noreferrer";
+	link.download = "download.glb";
+	link.href = URL;
+	link.click();
 }
